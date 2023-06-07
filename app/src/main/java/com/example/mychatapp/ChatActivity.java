@@ -1,17 +1,27 @@
 package com.example.mychatapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
     GoogleSignInAccount account;
+    MessageAdapter adapter;
+    private List<chatMessage> messages = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,5 +37,23 @@ public class ChatActivity extends AppCompatActivity {
         ImageView userImage = findViewById(R.id.mainUserImage);
         Glide.with(this).load(account.getPhotoUrl()).into(userImage);
 
+        adapter = new MessageAdapter();
+        RecyclerView recycler = findViewById(R.id.chatRV);
+        recycler.setHasFixedSize(false);
+        RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(),1);
+        recycler.setLayoutManager(manager);
+
+        recycler.setAdapter(adapter);
+
+        FloatingActionButton btn = findViewById(R.id.addMessageBtn);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText text = findViewById(R.id.messageET);
+                chatMessage m = new chatMessage(account.getPhotoUrl().toString(),account.getDisplayName(),account.getId(),text.getText().toString());
+                adapter.addMessage(m);
+                text.setText("");
+            }
+        });
     }
 }
